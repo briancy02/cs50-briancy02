@@ -115,7 +115,10 @@ class Sentence():
         """
         Returns the set of all cells in self.cells known to be safe.
         """
-        return self.cells - self.known_mines()
+        if self.count == 0:
+          return self.cells
+        else:
+          return set()
 
     def mark_mine(self, cell):
         """
@@ -188,7 +191,7 @@ class MinesweeperAI():
                if they can be inferred from existing knowledge
         """
         self.moves_made.add(cell)
-        self.safes.add(cell)
+        self.mark_safe(cell)
         neighbors = list()
         
         # Add neighboring cells
