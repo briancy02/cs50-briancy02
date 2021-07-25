@@ -1,9 +1,4 @@
-"""
-Tic Tac Toe Player
-"""
-
 import math
-import util
 
 X = "X"
 O = "O"
@@ -51,9 +46,15 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    board[action[0]][action[1]] = player(board)
+    new_board = [[EMPTY, EMPTY, EMPTY],
+            [EMPTY, EMPTY, EMPTY],
+            [EMPTY, EMPTY, EMPTY]]
+    for i in range(len(board)):
+      for j in range(len(board[0])):
+        new_board[i][j] = board[i][j]
+    new_board[action[0]][action[1]] = player(board)
 
-    return board
+    return new_board
 
 
 def winner(board):
@@ -123,23 +124,47 @@ def utility(board):
 
 def minimax(board):
     """
-    Returns the optimal action for the current player on the board.
+    Returns the optimal action for the current player_value on the board.
     """
-    actions = actions(board)
+    actions_list = actions(board)
     optimal_action = None
-    player = player(board)
-    if player == 'X':
-        max_value = min;
-        for action in actions:
-            new_max = max_value(result(board, action))
-            if max_value < new_max:
+    player_value = player(board)
+    if player_value == 'X':
+        max_val = -2;
+        for action in actions_list:
+            new_max = min_value(result(board, action))
+            if max_val < new_max:
                 optimal_action = action
-                max_value = new_max
-    elif player == 'O':
-        min_value = max;
-        for action in actions:
-            new_min = min_value(result(board, action))
-            if min_value > new_min:
+                max_val = new_max
+    elif player_value == 'O':
+        min_val = 2;
+        for action in actions_list:
+            new_min = max_value(result(board, action))
+            if min_val > new_min:
                 optimal_action = action
-                min_value = new_min   
-    return optimal_action            
+                min_val = new_min   
+    return optimal_action  
+
+def min_value(board):
+    if terminal(board):
+      return utility(board)
+    actions_list = actions(board)
+    min_val = 2;
+    for action in actions_list:
+      new_min = max_value(result(board, action))
+      if min_val > new_min:
+        min_val = new_min  
+    return min_val
+
+def max_value(board):
+    if terminal(board):
+      return utility(board)
+    actions_list = actions(board)
+    max_val = -2;
+    for action in actions_list:
+      new_max = min_value(result(board, action))
+      if max_val < new_max:
+        max_val = new_max
+    return max_val              
+
+         

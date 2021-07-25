@@ -1,3 +1,4 @@
+
 import itertools
 import random
 
@@ -188,27 +189,28 @@ class MinesweeperAI():
         """
         self.moves_made.add(cell)
         self.safes.add(cell)
-        neighbors = set()
+        neighbors = list()
         
         # Add neighboring cells
         for i in range(cell[0] - 1, cell[0] + 2):
-            for j in range(cell[1] - 1, cell[1] + 2):
-                if (i, j) == cell:
-                    continue
-                if 0 <= i < self.height and 0 <= j < self.width:
-                    neighbors.add(i, j)
+          for j in range(cell[1] - 1, cell[1] + 2):
+            if (i, j) == cell:
+              continue
+            if 0 <= i < self.height and 0 <= j < self.width:
+              neighbors.append((i, j))
+              
         new_sentence = Sentence(neighbors, count)
         
         # Improve sentence
         for neighbor in neighbors:
-            if neighbor in self.mines:
-                new_sentence.mark_mine(neighbor)
-            if neighbor in self.safes:
-                new_sentence.mark_safe(neighbor)   
+          if neighbor in self.mines:
+            new_sentence.mark_mine(neighbor)
+          if neighbor in self.safes:
+            new_sentence.mark_safe(neighbor)   
                 
         self.knowledge.append(new_sentence)
-        self.mines.add(new_sentence.known_mines())
-        self.safes.add(new_sentence.known_safes())
+        self.mines = self.mines.union(new_sentence.known_mines())
+        self.safes = self.safes.union(new_sentence.known_safes())
 
     def make_safe_move(self):
         """
@@ -220,7 +222,11 @@ class MinesweeperAI():
         and self.moves_made, but should not modify any of those values.
         """
         available_moves = self.safes - self.moves_made
-        return available_moves[0]
+        move = list(available_moves)
+        if move:
+          return move[0]
+        else:
+          return None
 
     def make_random_move(self):
         """
@@ -230,7 +236,10 @@ class MinesweeperAI():
             2) are not known to be mines
         """
         available_moves = list()
-        for move in self.moves_made:
-          if move not in self.mines:
-              available_moves.append(move)
-        return random.choice(available_moves)
+        for i in range(self.height):
+          for j in range(self.width):
+            if (i,j) not in self.moves_made and (i,j) not in self.mines:
+              available_moves.append((i,j))
+        if available_moves:
+          return random.choice(available_moves)
+        return None  
